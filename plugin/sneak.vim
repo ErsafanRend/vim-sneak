@@ -17,7 +17,8 @@ let s:st = { 'rst':1, 'input':'', 'inputlen':0, 'reverse':0, 'bounds':[0,0], 'in
 func! sneak#init()
   unlockvar g:sneak#opt
   "options                                 v-- for backwards-compatibility
-  let g:sneak#opt = { 'f_reset' : get(g:, 'sneak#nextprev_f', get(g:, 'sneak#f_reset', 1))
+  let g:sneak#opt = {
+      \  'f_reset'      : get(g:, 'sneak#nextprev_f', get(g:, 'sneak#f_reset', 1))
       \ ,'t_reset'      : get(g:, 'sneak#nextprev_t', get(g:, 'sneak#t_reset', 1))
       \ ,'s_next'       : get(g:, 'sneak#s_next', 0)
       \ ,'textobject_z' : get(g:, 'sneak#textobject_z', 1)
@@ -54,10 +55,11 @@ func! sneak#wrap(op, inputlen, reverse, inclusive, streak) abort
   " don't clever-repeat the last 's' search if this is an 'f' search, etc.
   let is_similar_invocation = a:inputlen == s:st.inputlen && a:inclusive == s:st.inclusive
 
-  if g:sneak#opt.s_next && is_similar_invocation && (sneak#util#isvisualop(a:op) || empty(a:op)) && sneak#is_sneaking()
+  if (1 >= a:streak) && g:sneak#opt.s_next && is_similar_invocation && (sneak#util#isvisualop(a:op) || empty(a:op)) && sneak#is_sneaking()
     call sneak#rpt(a:op, a:reverse) " s goes to next match
   else " s invokes new search
-    call sneak#to(a:op, s:getnchars(a:inputlen, a:op), a:inputlen, cnt, 0, a:reverse, a:inclusive, a:streak)
+    let input = sneak#is_sneaking() ? g:sneak#search#instance.search : s:getnchars(a:inputlen, a:op)
+    call sneak#to(a:op, input, a:inputlen, cnt, 0, a:reverse, a:inclusive, a:streak)
   endif
 endf
 
