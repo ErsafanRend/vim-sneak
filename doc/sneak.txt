@@ -191,6 +191,31 @@ sneak#reset(key)                                                *sneak#reset()*
 <
             Note: The <expr> modifier is required!
 
+sneak#state()                                                   *sneak#state()*
+        Returns a read-only dictionary representing the current behavior.
+
+            KEY             VALUE~
+            bounds          [left, right] integer pair representing the current
+                            |sneak-vertical-scope| or [0, 0] if not scoped
+            inclusive       0: |f|-like motion
+                            1: |t|-like motion
+                            2: |exclusive| motion like |/|
+            input           current search string
+            inputlen        length of the current search string
+            reverse         0: invoked as forward motion `s`
+                            1: invoked as backward motion `S`
+            rptreverse      0: repeated motion in "next" direction |;|
+                            1: repeated motion in "previous" direction |,|
+            rst             0: |;| and |,| should repeat the most recent Sneak
+                            1: after calling |sneak#reset()|
+
+        For example, to create a mapping that behaves differently depending
+        on the current Sneak direction (`reverse` key):
+>
+        nmap <silent> <expr> <tab> sneak#is_sneaking()
+              \ ? (sneak#state().rptreverse ? '<Plug>(SneakStreakBackward)<cr>' : '<Plug>(SneakStreak)<cr>')
+              \ : '<Plug>Sneak_s'
+<
 ------------------------------------------------------------------------------
 3.3 Visual Mode
 
@@ -428,7 +453,7 @@ your |vimrc|: >
     map ? <Plug>SneakNext
     map ? <Plug>SneakPrevious
 
-    " 1-character _inclusive_ Sneak (for enhanced 'f')
+    " 1-character enhanced 'f'
     nmap ? <Plug>Sneak_f
     nmap ? <Plug>Sneak_F
     " visual-mode
@@ -438,7 +463,7 @@ your |vimrc|: >
     omap ? <Plug>Sneak_f
     omap ? <Plug>Sneak_F
 
-    " 1-character _exclusive_ Sneak (for enhanced 't')
+    " 1-character enhanced 't'
     nmap ? <Plug>Sneak_t
     nmap ? <Plug>Sneak_T
     " visual-mode

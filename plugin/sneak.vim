@@ -37,6 +37,10 @@ endf
 
 call sneak#init()
 
+func! sneak#state()
+  return deepcopy(s:st)
+endf
+
 func! sneak#is_sneaking()
   return exists("#SneakPlugin#CursorMoved#<buffer>")
 endf
@@ -122,6 +126,7 @@ func! sneak#to(op, input, inputlen, count, repeatmotion, reverse, inclusive, str
   "      so this can be done in s.init() instead of here.
   call s.initpattern()
 
+  let s:st.rptreverse = a:reverse
   if !a:repeatmotion "this is a new (not repeat) invocation
     "persist even if the search fails, because the _reverse_ direction might have a match.
     let s:st.rst = 0 | let s:st.input = a:input | let s:st.inputlen = a:inputlen
@@ -131,7 +136,7 @@ func! sneak#to(op, input, inputlen, count, repeatmotion, reverse, inclusive, str
     call s:ft_hook()
   endif
 
-  if is_op && 2 != a:inclusive
+  if is_op && 2 != a:inclusive && !a:reverse
     norm! v
   endif
 
@@ -302,7 +307,7 @@ if g:sneak#opt.textobject_z
   omap Z  <Plug>Sneak_S
 endif
 
-" 1-char sneak, inclusive
+" 1-char 'enhanced f' sneak
 nnoremap <silent> <Plug>Sneak_f :<c-u>call sneak#wrap('', 1, 0, 1, 0)<cr>
 nnoremap <silent> <Plug>Sneak_F :<c-u>call sneak#wrap('', 1, 1, 1, 0)<cr>
 xnoremap <silent> <Plug>Sneak_f :<c-u>call sneak#wrap(visualmode(), 1, 0, 1, 0)<cr>
@@ -310,7 +315,7 @@ xnoremap <silent> <Plug>Sneak_F :<c-u>call sneak#wrap(visualmode(), 1, 1, 1, 0)<
 onoremap <silent> <Plug>Sneak_f :<c-u>call sneak#wrap(v:operator, 1, 0, 1, 0)<cr>
 onoremap <silent> <Plug>Sneak_F :<c-u>call sneak#wrap(v:operator, 1, 1, 1, 0)<cr>
 
-" 1-char sneak, exclusive
+" 1-char 'enhanced t' sneak
 nnoremap <silent> <Plug>Sneak_t :<c-u>call sneak#wrap('', 1, 0, 0, 0)<cr>
 nnoremap <silent> <Plug>Sneak_T :<c-u>call sneak#wrap('', 1, 1, 0, 0)<cr>
 xnoremap <silent> <Plug>Sneak_t :<c-u>call sneak#wrap(visualmode(), 1, 0, 0, 0)<cr>
