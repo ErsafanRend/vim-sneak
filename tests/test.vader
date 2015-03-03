@@ -1,3 +1,5 @@
+# vim -N -u NONE -c 'set rtp+=~/.vim/bundle/vim-sneak,~/.vim/bundle/vader.vim,~/.vim/bundle/vim-repeat' -c 'runtime! plugin/sneak.vim plugin/vader.vim plugin/repeat.vim' -c 'Vader ~/.vim/bundle/vim-sneak/tests/test.vader'
+#
 # BUG: highlight targets are bogus if &iminsert=1
 # BUG: sneak cannot find ёе: in this text
 # BUG: sneak cannot find е:а in this text
@@ -15,6 +17,8 @@
 # ёе:ёе:ёе:ёе:ёе:ёе:ёе:аааааааёе:а
 
 Execute (Clean up test environment):
+  set encoding=utf8
+  scriptencoding utf8
   nmap ; <Plug>SneakNext
   nmap \ <Plug>SneakPrevious
   omap \ <Plug>SneakPrevious
@@ -494,6 +498,9 @@ Given:
   abcdef abcdef abcdef
   abcdef abcdef abcdef
 
+Do (dummy step to work around Vim (or Vader) macro bug):
+  sab\<esc>u
+
 Do (clever-s):
   sabsax
 
@@ -597,15 +604,6 @@ Expect:
 #Expect:
 #  abcdef ``=2Bd-a3/+ =QWEOIJ/+     ~~~!!! ! { } abc AAaab
 #  abcdef ``=2Bd-a3/+ abCDef ``=2Bd-a3/+
-
-Expect:
-  abcdef ``=2Bd-a3/+ abCDef ``=2Bd-a3/+
-  `=QWEOIJ/+     ~~~!!! ! { } abc AAaxab
-  abcdef ``=2Bd-a3/+ abCDef ``=2Bd-a3/+
-
-#Expect:
-#  abcdef ``=2Bd-a3/+ abCDef ``=2Bd-a3/+
-#  bcdef ``=2Bd-a3/+ abCDef ``=2Bd-a3/+
 
 Given:
   | Option     | Type    | Default | Description                                    |
@@ -802,7 +800,7 @@ Given (kanji):
   この機能を使用する場合、コマンfooド
   ラインではなくてコマンドラインウィンドウから
 Do:
-  s機ix
+  s機能ix
 Expect:
   このx機能を使用する場合、コマンfooド
   ラインではなくてコマンドラインウィンドウから
@@ -812,7 +810,7 @@ Expect:
   この機能を使用する場合、コマンfxooド
   ラインではなくてコマンドラインウィンドウから
 Do:
-  sドix
+  sド\<cr>ix
 Expect:
   この機能を使用する場合、コマンfooxド
   ラインではなくてコマンドラインウィンドウから
@@ -1044,3 +1042,4 @@ Execute (cleanup):
   nmap s <Plug>Sneak_s
   nmap S <Plug>Sneak_S
   call sneak#init()
+

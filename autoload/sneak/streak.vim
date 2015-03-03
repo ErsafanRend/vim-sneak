@@ -92,7 +92,8 @@ func! s:do_streak(s, v, reverse) "{{{
 
   if choice == "\<Tab>" && overflow[0] > 0 "overflow => decorate next N matches
     call cursor(overflow[0], overflow[1])
-  elseif -1 != index(["\<Esc>", "\<C-c>"], choice)
+  elseif (strlen(g:sneak#opt.streak_esc) && choice ==# g:sneak#opt.streak_esc)
+        \ || -1 != index(["\<Esc>", "\<C-c>"], choice)
     return "\<Esc>" "exit streak-mode.
   elseif !mappedtoNext && !has_key(s:matchmap, choice) "press _any_ invalid key to escape.
     call feedkeys(choice) "exit streak-mode and fall through to Vim.
@@ -113,7 +114,7 @@ func! s:after()
   exec 'hi! link SneakPluginTarget '.s:orig_hl_sneaktarget
   call s:restore_statusline()
   let &synmaxcol=s:synmaxcol_orig
-  let &syntax=s:syntax_orig
+  silent! let &syntax=s:syntax_orig
   let &concealcursor=s:cc_orig
   let &conceallevel=s:cl_orig
   call s:restore_conceal_in_other_windows()
